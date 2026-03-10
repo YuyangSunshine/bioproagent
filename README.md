@@ -18,7 +18,6 @@ To address this critical execution gap, we propose **BioProAgent**, a training-f
 **Semantic Symbol Grounding:** To tackle the context bottleneck inherent in complex device schemas, we decouple high-dimensional payloads into symbolic pointers. This reduces token consumption by ~6× while maintaining 100% resource consistency.
 
 
-* 
 **Trustworthy Autonomy & Self-Correction:** Evaluated on the extended BioProBench, BioProAgent achieves 95.6% physical compliance (compared to 21.0% for ReAct) and an 88.7% success rate in error recovery (compared to 0% for standard baselines).
 
 
