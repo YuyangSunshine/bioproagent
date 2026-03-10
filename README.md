@@ -1,6 +1,7 @@
 # BioProAgent: Neuro-Symbolic Grounding for Constrained Scientific Planning
 
 > **🎉 News:** This work has been accepted by the [ICLR 2026 LLA Workshop](https://lifelongagent.github.io/)!
+> 
 > **⚠️ Note:** The concrete implementation code will be released very soon. Stay tuned!
 
 ## 📖 Overview
@@ -11,11 +12,9 @@ To address this critical execution gap, we propose **BioProAgent**, a training-f
 
 ## ✨ Key Contributions
 
-* 
 **State-Augmented Planning:** BioProAgent uses a deterministic FSM to enforce a strict Design-Verify-Rectify loop. This ensures that all hardware instructions undergo hierarchical verification for both scientific logic and physical safety before execution.
 
 
-* 
 **Semantic Symbol Grounding:** To tackle the context bottleneck inherent in complex device schemas, we decouple high-dimensional payloads into symbolic pointers. This reduces token consumption by ~6× while maintaining 100% resource consistency.
 
 
@@ -57,6 +56,3 @@ If you find our work or the BioProProject series helpful for your research, plea
 
 ```
 
----
-
-这份 README 的结构设计注重了学术严谨性和开源社区的易读性。您需要我为您进一步补充安装环境要求（Requirements）或快速启动（Quick Start）的模板小节吗？
