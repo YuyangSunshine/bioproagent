@@ -1,0 +1,19 @@
+{
+  "common": {
+    "code_success_tau": 0.5,
+    "code_success_c_p_threshold": 1.0,
+    "max_samples": 5,
+    "output_dir_framework": "outputs/evaluation"
+  },
+  "subsets": {
+    "A": "data/benchmarks/ProAgent-SubsetA.json",
+    "B": "data/benchmarks/ProAgent-SubsetB.json",
+    "C": "data/benchmarks/ProAgent-SubsetC.json",
+    "D": "data/benchmarks/ProAgent-SubsetD.json"
+  },
+  "framework": {
+    "enable_scientific_eval": true,
+    "use_simulator": true,
+    "verbose": true
+  }
+}

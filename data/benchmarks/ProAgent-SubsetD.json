@@ -1,0 +1,2124 @@
+[
+  {
+    "sourece": "Experiment 8: Metabolomics Experiment",
+    "templateName": "Metabolomics (HK2 Assay) – Standard Curve and Sample Preparation",
+    "query": "Design an automated workflow for the standard-curve preparation and sample-preprocessing steps in a metabolomics experiment. The workflow focuses on microplate layout and sample pretreatment. Key tasks include generating a serial dilution series of NADH standards to construct the calibration curve, and performing multi-level dilutions of high-concentration serum samples to ensure that final analytical results fall within the valid linear range.",
+    "current_state": "CODE_NEEDS_FIX",
+    "injected_error_code": {
+      "nodes": [
+        {
+          "templateNodeId": 1758101633018960,
+          "templateId": "1953687332561711106",
+          "resourceId": 29,
+          "nodeName": "Biomek i7 Hybrid (Span8+MC96) / Automated Liquid Handling Workstation-1",
+          "nodeType": "device",
+          "sequence": null,
+          "positionX": 100,
+          "positionY": -120,
+          "runningTimes": null,
+          "nodeConfig": {
+            "meta": {
+              "processType": "automated_pipetting_station",
+              "deviceName": "Automated pipetting workstation",
+              "version": "1.2"
+            },
+            "formSchema": {
+              "workflowSteps": {
+                "type": "array_group",
+                "label": "Workflow Steps",
+                "minItems": 1,
+                "maxItems": 20,
+                "ui": {
+                  "tooltip": "Define the steps of the pipetting workflow"
+                },
+                "itemSchema": {
+                  "stepName": {
+                    "type": "text_input",
+                    "label": "Step Name",
+                    "required": true,
+                    "defaultValue": "Pipetting steps",
+                    "ui": {
+                      "placeholder": "Please enter the step name"
+                    }
+                  },
+                  "operationType": {
+                    "type": "select_input",
+                    "label": "Operation Type",
+                    "required": true,
+                    "defaultValue": "transfer",
+                    "options": [
+                      {
+                        "value": "transfer",
+                        "label": "Pipetting"
+                      },
+                      {
+                        "value": "shake",
+                        "label": "Vortex"
+                      },
+                      {
+                        "value": "temperature",
+                        "label": "Temperature control"
+                      },
+                      {
+                        "value": "magneticModule",
+                        "label": "Magnetic Module"
+                      }
+                    ]
+                  },
+                  "magneticConsumable": {
+                    "type": "consumable_reference",
+                    "label": "Magnetic consumables",
+                    "required": true,
+                    "ui": {
+                      "placeholder": "Please select from the chosen consumables",
+                      "tooltip": "Select the consumable requiring magnetic force (inherited from the previous node)"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "magneticModule"
+                      ]
+                    }
+                  },
+                  "sourceConsumable": {
+                    "type": "consumable_select",
+                    "label": "Source Plate",
+                    "required": true,
+                    "ui": {
+                      "placeholder": "Please select the source plate",
+                      "tooltip": "Select the source plate for the operation"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "transfer",
+                        "shake",
+                        "temperature"
+                      ]
+                    }
+                  },
+                  "reagentName": {
+                    "type": "text_input",
+                    "label": "Reagent Name",
+                    "ui": {
+                      "placeholder": "Please enter the reagent name",
+                      "tooltip": "Reagent names involved in the input"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "transfer"
+                      ]
+                    }
+                  },
+                  "targetConsumable": {
+                    "type": "consumable_select",
+                    "label": "Target Plate",
+                    "ui": {
+                      "placeholder": "Please select the target plate",
+                      "tooltip": "Select the target plate for pipetting"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "transfer"
+                      ]
+                    }
+                  },
+                  "volume": {
+                    "type": "number_input",
+                    "label": "Pipetting volume",
+                    "defaultValue": 100,
+                    "validation": {
+                      "min": 0.5,
+                      "max": 5000,
+                      "step": 0.1,
+                      "precision": 1
+                    },
+                    "ui": {
+                      "tooltip": "Input pipetting volume"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "transfer"
+                      ]
+                    }
+                  },
+                  "unit": {
+                    "type": "select_input",
+                    "label": "Volume unit",
+                    "defaultValue": "µL",
+                    "options": [
+                      {
+                        "value": "µL",
+                        "label": "µL"
+                      },
+                      {
+                        "value": "mL",
+                        "label": "milliliter (mL)"
+                      }
+                    ],
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "transfer"
+                      ]
+                    }
+                  },
+                  "shakingMode": {
+                    "type": "select_input",
+                    "label": "Shaking mode",
+                    "defaultValue": "clockwise",
+                    "options": [
+                      {
+                        "value": "clockwise",
+                        "label": "Clockwise"
+                      },
+                      {
+                        "value": "counterclockwise",
+                        "label": "Counterclockwise"
+                      }
+                    ],
+                    "ui": {
+                      "tooltip": "Select oscillation direction"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "shake"
+                      ]
+                    }
+                  },
+                  "rotationSpeed_rpm": {
+                    "type": "number_input",
+                    "label": "rpm",
+                    "defaultValue": 300,
+                    "validation": {
+                      "min": 50,
+                      "max": 1200,
+                      "step": 10
+                    },
+                    "ui": {
+                      "suffix": "rpm",
+                      "tooltip": "Set oscillation speed"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "shake"
+                      ]
+                    }
+                  },
+                  "shakingDuration": {
+                    "type": "time_input",
+                    "label": "Shaking time",
+                    "defaultValue": "00:02:30",
+                    "ui": {
+                      "format": "HH:MM:SS",
+                      "tooltip": "Set oscillation duration"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "shake"
+                      ]
+                    }
+                  },
+                  "magneticDuration": {
+                    "type": "time_input",
+                    "label": "Time",
+                    "defaultValue": "00:02:30",
+                    "ui": {
+                      "format": "HH:MM:SS",
+                      "tooltip": "Set Duration"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "magneticModule"
+                      ]
+                    }
+                  },
+                  "temperature_C": {
+                    "type": "number_input",
+                    "label": "Temperature",
+                    "defaultValue": 25,
+                    "validation": {
+                      "min": 4,
+                      "max": 100,
+                      "step": 0.1,
+                      "precision": 1
+                    },
+                    "ui": {
+                      "suffix": "℃",
+                      "tooltip": "Set temperature"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "temperature"
+                      ]
+                    }
+                  },
+                  "temperatureDuration": {
+                    "type": "time_input",
+                    "label": "Temperature control time",
+                    "defaultValue": "00:10:00",
+                    "ui": {
+                      "format": "HH:MM:SS",
+                      "tooltip": "Set temperature-controlled duration"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "temperature"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "outputMapping": {
+              "arrays": {
+                "workflowSteps": {
+                  "sourceField": "workflowSteps",
+                  "itemMapping": {
+                    "stepName": "stepName",
+                    "operationType": "operationType",
+                    "reagentName": "reagentName",
+                    "sourceConsumable": "sourceConsumable",
+                    "targetConsumable": "targetConsumable",
+                    "volume": "volume",
+                    "unit": "unit",
+                    "shakingMode": "shakingMode",
+                    "rotationSpeed_rpm": "rotationSpeed_rpm",
+                    "shakingDuration": "shakingDuration",
+                    "temperature_C": "temperature_C",
+                    "temperatureDuration": "temperatureDuration",
+                    "magneticConsumable": "magneticConsumable",
+                    "magneticDuration": "magneticDuration"
+                  }
+                }
+              }
+            }
+          },
+          "parameters": {
+            "workflowSteps": [
+              {
+                "stepName": "Preparation of Standards",
+                "operationType": "transfer",
+                "reagentName": "LX/Detection Buffer",
+                "sourceConsumable": "new_10035",
+                "targetConsumable": "new_10041",
+                "volume": 150,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:30",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Preparation of Standards",
+                "operationType": "transfer",
+                "reagentName": "LX/Detection Buffer",
+                "sourceConsumable": "new_10035",
+                "targetConsumable": "new_10041",
+                "volume": 144,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:30",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Preparation of Standards",
+                "operationType": "transfer",
+                "reagentName": "LX/Detection Buffer",
+                "sourceConsumable": "new_10035",
+                "targetConsumable": "new_10041",
+                "volume": 138,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:30",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Preparation of Standards",
+                "operationType": "transfer",
+                "reagentName": "LX/Detection Buffer",
+                "sourceConsumable": "new_10035",
+                "targetConsumable": "new_10041",
+                "volume": 132,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:30",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Preparation of Standards",
+                "operationType": "transfer",
+                "reagentName": "LX/Detection Buffer",
+                "sourceConsumable": "new_10035",
+                "targetConsumable": "new_10041",
+                "volume": 126,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:30",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Preparation of Standards",
+                "operationType": "transfer",
+                "reagentName": "LX/Detection Buffer",
+                "sourceConsumable": "new_10035",
+                "targetConsumable": "new_10041",
+                "volume": 120,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:30",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Add standard",
+                "operationType": "transfer",
+                "reagentName": "NADH Standard I / NADH Standard",
+                "sourceConsumable": "new_10038",
+                "targetConsumable": "new_10041",
+                "volume": 6,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:30",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Add standard",
+                "operationType": "transfer",
+                "reagentName": "NADH Standard I / NADH Standard",
+                "sourceConsumable": "new_10038",
+                "targetConsumable": "new_10041",
+                "volume": 12,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:30",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Add standard",
+                "operationType": "transfer",
+                "reagentName": "NADH Standard I / NADH Standard",
+                "sourceConsumable": "new_10038",
+                "targetConsumable": "new_10041",
+                "volume": 18,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:30",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Add standard",
+                "operationType": "transfer",
+                "reagentName": "NADH Standard I / NADH Standard",
+                "sourceConsumable": "new_10038",
+                "targetConsumable": "new_10041",
+                "volume": 24,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:30",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Add standard",
+                "operationType": "transfer",
+                "reagentName": "NADH Standard I / NADH Standard",
+                "sourceConsumable": "new_10038",
+                "targetConsumable": "new_10041",
+                "volume": 30,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:30",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              }
+            ]
+          }
+        }
+      ],
+      "connections": [],
+      "consumables": []
+    },
+    "ground_truth_fix": {
+      "nodes": [
+        {
+          "templateNodeId": 1758101633018960,
+          "templateId": "1953687332561711106",
+          "resourceId": 59,
+          "nodeName": "Biomek i7 Hybrid (Span8+MC96) / Automated Liquid Handling Workstation-1",
+          "nodeType": "device",
+          "sequence": null,
+          "positionX": 100,
+          "positionY": -120,
+          "runningTimes": null,
+          "nodeConfig": {
+            "meta": {
+              "processType": "automated_pipetting_station",
+              "deviceName": "Automated pipetting workstation",
+              "version": "1.2"
+            },
+            "formSchema": {
+              "workflowSteps": {
+                "type": "array_group",
+                "label": "Workflow Steps",
+                "minItems": 1,
+                "maxItems": 20,
+                "ui": {
+                  "tooltip": "Define the steps of the pipetting workflow"
+                },
+                "itemSchema": {
+                  "stepName": {
+                    "type": "text_input",
+                    "label": "Step Name",
+                    "required": true,
+                    "defaultValue": "Pipetting steps",
+                    "ui": {
+                      "placeholder": "Please enter the step name"
+                    }
+                  },
+                  "operationType": {
+                    "type": "select_input",
+                    "label": "Operation Type",
+                    "required": true,
+                    "defaultValue": "transfer",
+                    "options": [
+                      {
+                        "value": "transfer",
+                        "label": "Pipetting"
+                      },
+                      {
+                        "value": "shake",
+                        "label": "Vortex"
+                      },
+                      {
+                        "value": "temperature",
+                        "label": "Temperature control"
+                      },
+                      {
+                        "value": "magneticModule",
+                        "label": "Magnetic Module"
+                      }
+                    ]
+                  },
+                  "magneticConsumable": {
+                    "type": "consumable_reference",
+                    "label": "Magnetic consumables",
+                    "required": true,
+                    "ui": {
+                      "placeholder": "Please select from the chosen consumables",
+                      "tooltip": "Select the consumable requiring magnetic force (inherited from the previous node)"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "magneticModule"
+                      ]
+                    }
+                  },
+                  "sourceConsumable": {
+                    "type": "consumable_select",
+                    "label": "Source Plate",
+                    "required": true,
+                    "ui": {
+                      "placeholder": "Please select the source plate",
+                      "tooltip": "Select the source plate for the operation"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "transfer",
+                        "shake",
+                        "temperature"
+                      ]
+                    }
+                  },
+                  "reagentName": {
+                    "type": "text_input",
+                    "label": "Reagent Name",
+                    "ui": {
+                      "placeholder": "Please enter the reagent name",
+                      "tooltip": "Reagent names involved in the input"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "transfer"
+                      ]
+                    }
+                  },
+                  "targetConsumable": {
+                    "type": "consumable_select",
+                    "label": "Target Plate",
+                    "ui": {
+                      "placeholder": "Please select the target plate",
+                      "tooltip": "Select the target plate for pipetting"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "transfer"
+                      ]
+                    }
+                  },
+                  "volume": {
+                    "type": "number_input",
+                    "label": "Pipetting volume",
+                    "defaultValue": 100,
+                    "validation": {
+                      "min": 0.5,
+                      "max": 5000,
+                      "step": 0.1,
+                      "precision": 1
+                    },
+                    "ui": {
+                      "tooltip": "Input pipetting volume"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "transfer"
+                      ]
+                    }
+                  },
+                  "unit": {
+                    "type": "select_input",
+                    "label": "Volume unit",
+                    "defaultValue": "µL",
+                    "options": [
+                      {
+                        "value": "µL",
+                        "label": "µL"
+                      },
+                      {
+                        "value": "mL",
+                        "label": "milliliter (mL)"
+                      }
+                    ],
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "transfer"
+                      ]
+                    }
+                  },
+                  "shakingMode": {
+                    "type": "select_input",
+                    "label": "Shaking mode",
+                    "defaultValue": "clockwise",
+                    "options": [
+                      {
+                        "value": "clockwise",
+                        "label": "Clockwise"
+                      },
+                      {
+                        "value": "counterclockwise",
+                        "label": "Counterclockwise"
+                      }
+                    ],
+                    "ui": {
+                      "tooltip": "Select oscillation direction"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "shake"
+                      ]
+                    }
+                  },
+                  "rotationSpeed_rpm": {
+                    "type": "number_input",
+                    "label": "rpm",
+                    "defaultValue": 300,
+                    "validation": {
+                      "min": 50,
+                      "max": 1200,
+                      "step": 10
+                    },
+                    "ui": {
+                      "suffix": "rpm",
+                      "tooltip": "Set oscillation speed"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "shake"
+                      ]
+                    }
+                  },
+                  "shakingDuration": {
+                    "type": "time_input",
+                    "label": "Shaking time",
+                    "defaultValue": "00:02:30",
+                    "ui": {
+                      "format": "HH:MM:SS",
+                      "tooltip": "Set oscillation duration"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "shake"
+                      ]
+                    }
+                  },
+                  "magneticDuration": {
+                    "type": "time_input",
+                    "label": "Time",
+                    "defaultValue": "00:02:30",
+                    "ui": {
+                      "format": "HH:MM:SS",
+                      "tooltip": "Set Duration"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "magneticModule"
+                      ]
+                    }
+                  },
+                  "temperature_C": {
+                    "type": "number_input",
+                    "label": "Temperature",
+                    "defaultValue": 25,
+                    "validation": {
+                      "min": 4,
+                      "max": 100,
+                      "step": 0.1,
+                      "precision": 1
+                    },
+                    "ui": {
+                      "suffix": "℃",
+                      "tooltip": "Set temperature"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "temperature"
+                      ]
+                    }
+                  },
+                  "temperatureDuration": {
+                    "type": "time_input",
+                    "label": "Temperature control time",
+                    "defaultValue": "00:10:00",
+                    "ui": {
+                      "format": "HH:MM:SS",
+                      "tooltip": "Set temperature-controlled duration"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "temperature"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "outputMapping": {
+              "arrays": {
+                "workflowSteps": {
+                  "sourceField": "workflowSteps",
+                  "itemMapping": {
+                    "stepName": "stepName",
+                    "operationType": "operationType",
+                    "reagentName": "reagentName",
+                    "sourceConsumable": "sourceConsumable",
+                    "targetConsumable": "targetConsumable",
+                    "volume": "volume",
+                    "unit": "unit",
+                    "shakingMode": "shakingMode",
+                    "rotationSpeed_rpm": "rotationSpeed_rpm",
+                    "shakingDuration": "shakingDuration",
+                    "temperature_C": "temperature_C",
+                    "temperatureDuration": "temperatureDuration",
+                    "magneticConsumable": "magneticConsumable",
+                    "magneticDuration": "magneticDuration"
+                  }
+                }
+              }
+            }
+          },
+          "parameters": {
+            "workflowSteps": [
+              {
+                "stepName": "Preparation of Standards",
+                "operationType": "transfer",
+                "reagentName": "LX/Detection Buffer",
+                "sourceConsumable": "new_10035",
+                "targetConsumable": "new_10041",
+                "volume": 150,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:30",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Preparation of Standards",
+                "operationType": "transfer",
+                "reagentName": "LX/Detection Buffer",
+                "sourceConsumable": "new_10035",
+                "targetConsumable": "new_10041",
+                "volume": 144,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:30",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Preparation of Standards",
+                "operationType": "transfer",
+                "reagentName": "LX/Detection Buffer",
+                "sourceConsumable": "new_10035",
+                "targetConsumable": "new_10041",
+                "volume": 138,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:30",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Preparation of Standards",
+                "operationType": "transfer",
+                "reagentName": "LX/Detection Buffer",
+                "sourceConsumable": "new_10035",
+                "targetConsumable": "new_10041",
+                "volume": 132,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:30",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Preparation of Standards",
+                "operationType": "transfer",
+                "reagentName": "LX/Detection Buffer",
+                "sourceConsumable": "new_10035",
+                "targetConsumable": "new_10041",
+                "volume": 126,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:30",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Preparation of Standards",
+                "operationType": "transfer",
+                "reagentName": "LX/Detection Buffer",
+                "sourceConsumable": "new_10035",
+                "targetConsumable": "new_10041",
+                "volume": 120,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:30",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Add standard",
+                "operationType": "transfer",
+                "reagentName": "NADH Standard I / NADH Standard",
+                "sourceConsumable": "new_10038",
+                "targetConsumable": "new_10041",
+                "volume": 6,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:30",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Add standard",
+                "operationType": "transfer",
+                "reagentName": "NADH Standard I / NADH Standard",
+                "sourceConsumable": "new_10038",
+                "targetConsumable": "new_10041",
+                "volume": 12,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:30",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Add standard",
+                "operationType": "transfer",
+                "reagentName": "NADH Standard I / NADH Standard",
+                "sourceConsumable": "new_10038",
+                "targetConsumable": "new_10041",
+                "volume": 18,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:30",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Add standard",
+                "operationType": "transfer",
+                "reagentName": "NADH Standard I / NADH Standard",
+                "sourceConsumable": "new_10038",
+                "targetConsumable": "new_10041",
+                "volume": 24,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:30",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Add standard",
+                "operationType": "transfer",
+                "reagentName": "NADH Standard I / NADH Standard",
+                "sourceConsumable": "new_10038",
+                "targetConsumable": "new_10041",
+                "volume": 30,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:30",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              }
+            ]
+          }
+        }
+      ],
+      "connections": [],
+      "consumables": []
+    },
+    "error_type": "INVALID_RESOURCE_ID",
+    "error_description": "xxx"
+  },
+  {
+    "sourece": "Experiment 8: Metabolomics Experiment",
+    "templateName": "Metabolomics (HK2 Assay) – Reagent Reconstitution and Preparation",
+    "query": "Design an automated workflow for reconstitution and preparation of reagents in metabolomics experiments. This workflow serves as the pre-processing stage of the experiment. Its primary task is to automatically reconstitute and mix all required lyophilized reagents (e.g., coenzymes, developer enzyme mixtures, NADH standards) to ensure that all core components are in an active state and ready for subsequent use.",
+    "current_state": "CODE_NEEDS_FIX",
+    "injected_error_code": {
+      "nodes": [
+        {
+          "templateNodeId": 1758100169961010,
+          "templateId": "1953687332561711106",
+          "resourceId": 59,
+          "nodeName": "Biomek i7 Hybrid (Span8+MC96) / Automated Liquid Handling Workstation-1",
+          "nodeType": "device",
+          "sequence": null,
+          "positionX": -260,
+          "positionY": -120,
+          "runningTimes": null,
+          "nodeConfig": {
+            "meta": {
+              "processType": "automated_pipetting_station",
+              "deviceName": "Automated pipetting workstation",
+              "version": "1.2"
+            },
+            "formSchema": {
+              "workflowSteps": {
+                "type": "array_group",
+                "label": "Workflow Steps",
+                "minItems": 1,
+                "maxItems": 20,
+                "ui": {
+                  "tooltip": "Define the steps of the pipetting workflow"
+                },
+                "itemSchema": {
+                  "stepName": {
+                    "type": "text_input",
+                    "label": "Step Name",
+                    "required": true,
+                    "defaultValue": "Pipetting steps",
+                    "ui": {
+                      "placeholder": "Please enter the step name"
+                    }
+                  },
+                  "operationType": {
+                    "type": "select_input",
+                    "label": "Operation Type",
+                    "required": true,
+                    "defaultValue": "transfer",
+                    "options": [
+                      {
+                        "value": "transfer",
+                        "label": "Pipetting"
+                      },
+                      {
+                        "value": "shake",
+                        "label": "Vortex"
+                      },
+                      {
+                        "value": "temperature",
+                        "label": "Temperature control"
+                      },
+                      {
+                        "value": "magneticModule",
+                        "label": "Magnetic Module"
+                      }
+                    ]
+                  },
+                  "magneticConsumable": {
+                    "type": "consumable_reference",
+                    "label": "Magnetic consumables",
+                    "required": true,
+                    "ui": {
+                      "placeholder": "Please select from the chosen consumables",
+                      "tooltip": "Select the consumable requiring magnetic force (inherited from the previous node)"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "magneticModule"
+                      ]
+                    }
+                  },
+                  "sourceConsumable": {
+                    "type": "consumable_select",
+                    "label": "Source Plate",
+                    "required": true,
+                    "ui": {
+                      "placeholder": "Please select the source plate",
+                      "tooltip": "Select the source plate for the operation"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "transfer",
+                        "shake",
+                        "temperature"
+                      ]
+                    }
+                  },
+                  "reagentName": {
+                    "type": "text_input",
+                    "label": "Reagent Name",
+                    "ui": {
+                      "placeholder": "Please enter the reagent name",
+                      "tooltip": "Reagent names involved in the input"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "transfer"
+                      ]
+                    }
+                  },
+                  "targetConsumable": {
+                    "type": "consumable_select",
+                    "label": "Target Plate",
+                    "ui": {
+                      "placeholder": "Please select the target plate",
+                      "tooltip": "Select the target plate for pipetting"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "transfer"
+                      ]
+                    }
+                  },
+                  "volume": {
+                    "type": "number_input",
+                    "label": "Pipetting volume",
+                    "defaultValue": 100,
+                    "validation": {
+                      "min": 0.5,
+                      "max": 5000,
+                      "step": 0.1,
+                      "precision": 1
+                    },
+                    "ui": {
+                      "tooltip": "Input pipetting volume"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "transfer"
+                      ]
+                    }
+                  },
+                  "unit": {
+                    "type": "select_input",
+                    "label": "Volume unit",
+                    "defaultValue": "µL",
+                    "options": [
+                      {
+                        "value": "µL",
+                        "label": "µL"
+                      },
+                      {
+                        "value": "mL",
+                        "label": "milliliter (mL)"
+                      }
+                    ],
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "transfer"
+                      ]
+                    }
+                  },
+                  "shakingMode": {
+                    "type": "select_input",
+                    "label": "Shaking mode",
+                    "defaultValue": "clockwise",
+                    "options": [
+                      {
+                        "value": "clockwise",
+                        "label": "Clockwise"
+                      },
+                      {
+                        "value": "counterclockwise",
+                        "label": "Counterclockwise"
+                      }
+                    ],
+                    "ui": {
+                      "tooltip": "Select oscillation direction"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "shake"
+                      ]
+                    }
+                  },
+                  "rotationSpeed_rpm": {
+                    "type": "number_input",
+                    "label": "rpm",
+                    "defaultValue": 300,
+                    "validation": {
+                      "min": 50,
+                      "max": 1200,
+                      "step": 10
+                    },
+                    "ui": {
+                      "suffix": "rpm",
+                      "tooltip": "Set oscillation speed"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "shake"
+                      ]
+                    }
+                  },
+                  "shakingDuration": {
+                    "type": "time_input",
+                    "label": "Shaking time",
+                    "defaultValue": "00:02:30",
+                    "ui": {
+                      "format": "HH:MM:SS",
+                      "tooltip": "Set oscillation duration"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "shake"
+                      ]
+                    }
+                  },
+                  "magneticDuration": {
+                    "type": "time_input",
+                    "label": "Time",
+                    "defaultValue": "00:02:30",
+                    "ui": {
+                      "format": "HH:MM:SS",
+                      "tooltip": "Set Duration"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "magneticModule"
+                      ]
+                    }
+                  },
+                  "temperature_C": {
+                    "type": "number_input",
+                    "label": "Temperature",
+                    "defaultValue": 25,
+                    "validation": {
+                      "min": 4,
+                      "max": 100,
+                      "step": 0.1,
+                      "precision": 1
+                    },
+                    "ui": {
+                      "suffix": "℃",
+                      "tooltip": "Set temperature"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "temperature"
+                      ]
+                    }
+                  },
+                  "temperatureDuration": {
+                    "type": "time_input",
+                    "label": "Temperature control time",
+                    "defaultValue": "00:10:00",
+                    "ui": {
+                      "format": "HH:MM:SS",
+                      "tooltip": "Set temperature-controlled duration"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "temperature"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "outputMapping": {
+              "arrays": {
+                "workflowSteps": {
+                  "sourceField": "workflowSteps",
+                  "itemMapping": {
+                    "stepName": "stepName",
+                    "operationType": "operationType",
+                    "reagentName": "reagentName",
+                    "sourceConsumable": "sourceConsumable",
+                    "targetConsumable": "targetConsumable",
+                    "volume": "volume",
+                    "unit": "unit",
+                    "shakingMode": "shakingMode",
+                    "rotationSpeed_rpm": "rotationSpeed_rpm",
+                    "shakingDuration": "shakingDuration",
+                    "temperature_C": "temperature_C",
+                    "temperatureDuration": "temperatureDuration",
+                    "magneticConsumable": "magneticConsumable",
+                    "magneticDuration": "magneticDuration"
+                  }
+                }
+              }
+            }
+          },
+          "parameters": {
+            "workflowSteps": [
+              {
+                "stepName": "Reagent Preparation - 0.2 M Coenzyme",
+                "operationType": "transfer",
+                "reagentName": "LX/Detection Buffer",
+                "sourceConsumable": "new_10035",
+                "targetConsumable": "new_10038",
+                "volume": 220,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:30",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Pipetting steps",
+                "operationType": "shake",
+                "reagentName": "",
+                "sourceConsumable": "new_10038",
+                "targetConsumable": "",
+                "volume": 100,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:00",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Dissolve the developing enzyme",
+                "operationType": "transfer",
+                "reagentName": "LX/Detection Buffer",
+                "sourceConsumable": "new_10038",
+                "targetConsumable": "new_10038",
+                "volume": 220,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:30",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Pipetting steps",
+                "operationType": "shake",
+                "reagentName": "",
+                "sourceConsumable": "new_10038",
+                "targetConsumable": "",
+                "volume": 100,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:00",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Dissolve Developer III/Developer",
+                "operationType": "transfer",
+                "reagentName": "LX/Detection Buffer",
+                "sourceConsumable": "96-channel reagent reservoir, single-channel, high skirt, 290 mL",
+                "targetConsumable": "new_10038",
+                "volume": 220,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:30",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Oscillating melt",
+                "operationType": "shake",
+                "reagentName": "Developer III/Developer",
+                "sourceConsumable": "new_10038",
+                "targetConsumable": "",
+                "volume": 100,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:00",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Vortex to dissolve",
+                "operationType": "shake",
+                "reagentName": "",
+                "sourceConsumable": "new_10038",
+                "targetConsumable": "",
+                "volume": 100,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:00",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Dissolve the standard",
+                "operationType": "transfer",
+                "reagentName": "LX/Detection Buffer",
+                "sourceConsumable": "new_10035",
+                "targetConsumable": "new_10038",
+                "volume": 400,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:30",
+                "temperature_C": 200,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Vortex to dissolve",
+                "operationType": "shake",
+                "reagentName": "",
+                "sourceConsumable": "new_10038",
+                "targetConsumable": "",
+                "volume": 100,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:00",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Dissolve the hexokinase positive control",
+                "operationType": "transfer",
+                "reagentName": "LX/Detection Buffer",
+                "sourceConsumable": "new_10035",
+                "targetConsumable": "new_10038",
+                "volume": 100,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:30",
+                "temperature_C": 125,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Vortex to dissolve",
+                "operationType": "shake",
+                "reagentName": "",
+                "sourceConsumable": "new_10038",
+                "targetConsumable": "",
+                "volume": 100,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:00",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              }
+            ]
+          }
+        }
+      ],
+      "connections": [],
+      "consumables": [
+        {
+          "consumableInstanceId": "1762262418261445",
+          "consumableId": 10040,
+          "consumableName": "96-well black microplate (newly added)",
+          "specification": "80 pieces/box, 320 pieces/case (Model: J09602)",
+          "unit": "piece",
+          "sourceNodeId": "1758100169961010",
+          "createdAt": 1762262418261,
+          "remark": null,
+          "usedByNodeIds": [
+            "1758100169961010"
+          ],
+          "referenceCount": 1
+        },
+        {
+          "consumableInstanceId": "1762262421455420",
+          "consumableId": 10035,
+          "consumableName": "96-channel reagent reservoir, single-channel, high skirt, 290 mL (new)",
+          "specification": "5 pieces/bag, 10 bags/case (Model: RES-290-96SW)",
+          "unit": "piece",
+          "sourceNodeId": "1758100169961010",
+          "createdAt": 1762262421455,
+          "remark": null,
+          "usedByNodeIds": [
+            "1758100169961010"
+          ],
+          "referenceCount": 1
+        },
+        {
+          "consumableInstanceId": "1762262421455578",
+          "consumableId": 10035,
+          "consumableName": "96-channel reagent reservoir, single-channel, high skirt, 290 mL (new)",
+          "specification": "5 pieces/bag, 10 bags/case (Model: RES-290-96SW)",
+          "unit": "piece",
+          "sourceNodeId": "1758100169961010",
+          "createdAt": 1762262421455,
+          "remark": "Biomek i7 Hybrid (Span8+MC96) / Automated Liquid Handling Station-1_96-channel reservoir, single-channel, high-profile skirt, 290 mL (newly added)",
+          "usedByNodeIds": [
+            "1758100169961010"
+          ],
+          "referenceCount": 1
+        },
+        {
+          "consumableInstanceId": "1762262431799776",
+          "consumableId": 10036,
+          "consumableName": "200 μL 96-well PCR plate (new)",
+          "specification": "100 pieces/box (Model: PCR-96BR-HF-W-P)",
+          "unit": "piece",
+          "sourceNodeId": "1758100169961010",
+          "createdAt": 1762262431799,
+          "remark": null,
+          "usedByNodeIds": [
+            "1758100169961010"
+          ],
+          "referenceCount": 1
+        },
+        {
+          "consumableInstanceId": "1762262435345593",
+          "consumableId": 10038,
+          "consumableName": "2.2 mL Square-well U-bottom Deep-well Plate (New)",
+          "specification": "50 plates/case (Model: P-2.2-SQ-96)",
+          "unit": "piece",
+          "sourceNodeId": "1758100169961010",
+          "createdAt": 1762262435345,
+          "remark": null,
+          "usedByNodeIds": [
+            "1758100169961010"
+          ],
+          "referenceCount": 1
+        },
+        {
+          "consumableInstanceId": "1762262435346725",
+          "consumableId": 10038,
+          "consumableName": "2.2 mL Square-well U-bottom Deep-well Plate (New)",
+          "specification": "50 plates/case (Model: P-2.2-SQ-96)",
+          "unit": "piece",
+          "sourceNodeId": "1758100169961010",
+          "createdAt": 1762262435346,
+          "remark": "Biomek i7 Hybrid (Span8+MC96) / Automated Liquid Handling Station-1_2.2 mL square-well U-bottom deep-well plate (newly added)",
+          "usedByNodeIds": [
+            "1758100169961010"
+          ],
+          "referenceCount": 1
+        }
+      ]
+    },
+    "ground_truth_fix": {
+      "nodes": [
+        {
+          "templateNodeId": 1758100169961010,
+          "templateId": "1953687332561711106",
+          "resourceId": 59,
+          "nodeName": "Biomek i7 Hybrid (Span8+MC96) / Automated Liquid Handling Workstation-1",
+          "nodeType": "device",
+          "sequence": null,
+          "positionX": -260,
+          "positionY": -120,
+          "runningTimes": null,
+          "nodeConfig": {
+            "meta": {
+              "processType": "automated_pipetting_station",
+              "deviceName": "Automated pipetting workstation",
+              "version": "1.2"
+            },
+            "formSchema": {
+              "workflowSteps": {
+                "type": "array_group",
+                "label": "Workflow Steps",
+                "minItems": 1,
+                "maxItems": 20,
+                "ui": {
+                  "tooltip": "Define the steps of the pipetting workflow"
+                },
+                "itemSchema": {
+                  "stepName": {
+                    "type": "text_input",
+                    "label": "Step Name",
+                    "required": true,
+                    "defaultValue": "Pipetting steps",
+                    "ui": {
+                      "placeholder": "Please enter the step name"
+                    }
+                  },
+                  "operationType": {
+                    "type": "select_input",
+                    "label": "Operation Type",
+                    "required": true,
+                    "defaultValue": "transfer",
+                    "options": [
+                      {
+                        "value": "transfer",
+                        "label": "Pipetting"
+                      },
+                      {
+                        "value": "shake",
+                        "label": "Vortex"
+                      },
+                      {
+                        "value": "temperature",
+                        "label": "Temperature control"
+                      },
+                      {
+                        "value": "magneticModule",
+                        "label": "Magnetic Module"
+                      }
+                    ]
+                  },
+                  "magneticConsumable": {
+                    "type": "consumable_reference",
+                    "label": "Magnetic consumables",
+                    "required": true,
+                    "ui": {
+                      "placeholder": "Please select from the chosen consumables",
+                      "tooltip": "Select the consumable requiring magnetic force (inherited from the previous node)"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "magneticModule"
+                      ]
+                    }
+                  },
+                  "sourceConsumable": {
+                    "type": "consumable_select",
+                    "label": "Source Plate",
+                    "required": true,
+                    "ui": {
+                      "placeholder": "Please select the source plate",
+                      "tooltip": "Select the source plate for the operation"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "transfer",
+                        "shake",
+                        "temperature"
+                      ]
+                    }
+                  },
+                  "reagentName": {
+                    "type": "text_input",
+                    "label": "Reagent Name",
+                    "ui": {
+                      "placeholder": "Please enter the reagent name",
+                      "tooltip": "Reagent names involved in the input"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "transfer"
+                      ]
+                    }
+                  },
+                  "targetConsumable": {
+                    "type": "consumable_select",
+                    "label": "Target Plate",
+                    "ui": {
+                      "placeholder": "Please select the target plate",
+                      "tooltip": "Select the target plate for pipetting"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "transfer"
+                      ]
+                    }
+                  },
+                  "volume": {
+                    "type": "number_input",
+                    "label": "Pipetting volume",
+                    "defaultValue": 100,
+                    "validation": {
+                      "min": 0.5,
+                      "max": 5000,
+                      "step": 0.1,
+                      "precision": 1
+                    },
+                    "ui": {
+                      "tooltip": "Input pipetting volume"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "transfer"
+                      ]
+                    }
+                  },
+                  "unit": {
+                    "type": "select_input",
+                    "label": "Volume unit",
+                    "defaultValue": "µL",
+                    "options": [
+                      {
+                        "value": "µL",
+                        "label": "µL"
+                      },
+                      {
+                        "value": "mL",
+                        "label": "milliliter (mL)"
+                      }
+                    ],
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "transfer"
+                      ]
+                    }
+                  },
+                  "shakingMode": {
+                    "type": "select_input",
+                    "label": "Shaking mode",
+                    "defaultValue": "clockwise",
+                    "options": [
+                      {
+                        "value": "clockwise",
+                        "label": "Clockwise"
+                      },
+                      {
+                        "value": "counterclockwise",
+                        "label": "Counterclockwise"
+                      }
+                    ],
+                    "ui": {
+                      "tooltip": "Select oscillation direction"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "shake"
+                      ]
+                    }
+                  },
+                  "rotationSpeed_rpm": {
+                    "type": "number_input",
+                    "label": "rpm",
+                    "defaultValue": 300,
+                    "validation": {
+                      "min": 50,
+                      "max": 1200,
+                      "step": 10
+                    },
+                    "ui": {
+                      "suffix": "rpm",
+                      "tooltip": "Set oscillation speed"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "shake"
+                      ]
+                    }
+                  },
+                  "shakingDuration": {
+                    "type": "time_input",
+                    "label": "Shaking time",
+                    "defaultValue": "00:02:30",
+                    "ui": {
+                      "format": "HH:MM:SS",
+                      "tooltip": "Set oscillation duration"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "shake"
+                      ]
+                    }
+                  },
+                  "magneticDuration": {
+                    "type": "time_input",
+                    "label": "Time",
+                    "defaultValue": "00:02:30",
+                    "ui": {
+                      "format": "HH:MM:SS",
+                      "tooltip": "Set Duration"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "magneticModule"
+                      ]
+                    }
+                  },
+                  "temperature_C": {
+                    "type": "number_input",
+                    "label": "Temperature",
+                    "defaultValue": 25,
+                    "validation": {
+                      "min": 4,
+                      "max": 100,
+                      "step": 0.1,
+                      "precision": 1
+                    },
+                    "ui": {
+                      "suffix": "℃",
+                      "tooltip": "Set temperature"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "temperature"
+                      ]
+                    }
+                  },
+                  "temperatureDuration": {
+                    "type": "time_input",
+                    "label": "Temperature control time",
+                    "defaultValue": "00:10:00",
+                    "ui": {
+                      "format": "HH:MM:SS",
+                      "tooltip": "Set temperature-controlled duration"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "temperature"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "outputMapping": {
+              "arrays": {
+                "workflowSteps": {
+                  "sourceField": "workflowSteps",
+                  "itemMapping": {
+                    "stepName": "stepName",
+                    "operationType": "operationType",
+                    "reagentName": "reagentName",
+                    "sourceConsumable": "sourceConsumable",
+                    "targetConsumable": "targetConsumable",
+                    "volume": "volume",
+                    "unit": "unit",
+                    "shakingMode": "shakingMode",
+                    "rotationSpeed_rpm": "rotationSpeed_rpm",
+                    "shakingDuration": "shakingDuration",
+                    "temperature_C": "temperature_C",
+                    "temperatureDuration": "temperatureDuration",
+                    "magneticConsumable": "magneticConsumable",
+                    "magneticDuration": "magneticDuration"
+                  }
+                }
+              }
+            }
+          },
+          "parameters": {
+            "workflowSteps": [
+              {
+                "stepName": "Reagent Preparation - 0.2 M Coenzyme",
+                "operationType": "transfer",
+                "reagentName": "LX/Detection Buffer",
+                "sourceConsumable": "new_10035",
+                "targetConsumable": "new_10038",
+                "volume": 220,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:30",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Pipetting steps",
+                "operationType": "shake",
+                "reagentName": "",
+                "sourceConsumable": "new_10038",
+                "targetConsumable": "",
+                "volume": 100,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:00",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Dissolve the developing enzyme",
+                "operationType": "transfer",
+                "reagentName": "LX/Detection Buffer",
+                "sourceConsumable": "new_10038",
+                "targetConsumable": "new_10038",
+                "volume": 220,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:30",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Pipetting steps",
+                "operationType": "shake",
+                "reagentName": "",
+                "sourceConsumable": "new_10038",
+                "targetConsumable": "",
+                "volume": 100,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:00",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Dissolve Developer III/Developer",
+                "operationType": "transfer",
+                "reagentName": "LX/Detection Buffer",
+                "sourceConsumable": "96-channel reagent reservoir, single-channel, high skirt, 290 mL",
+                "targetConsumable": "new_10038",
+                "volume": 220,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:30",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Oscillating melt",
+                "operationType": "shake",
+                "reagentName": "Developer III/Developer",
+                "sourceConsumable": "new_10038",
+                "targetConsumable": "",
+                "volume": 100,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:00",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Vortex to dissolve",
+                "operationType": "shake",
+                "reagentName": "",
+                "sourceConsumable": "new_10038",
+                "targetConsumable": "",
+                "volume": 100,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:00",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Dissolve the standard",
+                "operationType": "transfer",
+                "reagentName": "LX/Detection Buffer",
+                "sourceConsumable": "new_10035",
+                "targetConsumable": "new_10038",
+                "volume": 400,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:30",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Vortex to dissolve",
+                "operationType": "shake",
+                "reagentName": "",
+                "sourceConsumable": "new_10038",
+                "targetConsumable": "",
+                "volume": 100,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:00",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Dissolve the hexokinase positive control",
+                "operationType": "transfer",
+                "reagentName": "LX/Detection Buffer",
+                "sourceConsumable": "new_10035",
+                "targetConsumable": "new_10038",
+                "volume": 100,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:30",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              },
+              {
+                "stepName": "Vortex to dissolve",
+                "operationType": "shake",
+                "reagentName": "",
+                "sourceConsumable": "new_10038",
+                "targetConsumable": "",
+                "volume": 100,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:00",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              }
+            ]
+          }
+        }
+      ],
+      "connections": [],
+      "consumables": [
+        {
+          "consumableInstanceId": "1762262418261445",
+          "consumableId": 10040,
+          "consumableName": "96-well black microplate (newly added)",
+          "specification": "80 pieces/box, 320 pieces/case (Model: J09602)",
+          "unit": "piece",
+          "sourceNodeId": "1758100169961010",
+          "createdAt": 1762262418261,
+          "remark": null,
+          "usedByNodeIds": [
+            "1758100169961010"
+          ],
+          "referenceCount": 1
+        },
+        {
+          "consumableInstanceId": "1762262421455420",
+          "consumableId": 10035,
+          "consumableName": "96-channel reagent reservoir, single-channel, high skirt, 290 mL (new)",
+          "specification": "5 pieces/bag, 10 bags/case (Model: RES-290-96SW)",
+          "unit": "piece",
+          "sourceNodeId": "1758100169961010",
+          "createdAt": 1762262421455,
+          "remark": null,
+          "usedByNodeIds": [
+            "1758100169961010"
+          ],
+          "referenceCount": 1
+        },
+        {
+          "consumableInstanceId": "1762262421455578",
+          "consumableId": 10035,
+          "consumableName": "96-channel reagent reservoir, single-channel, high skirt, 290 mL (new)",
+          "specification": "5 pieces/bag, 10 bags/case (Model: RES-290-96SW)",
+          "unit": "piece",
+          "sourceNodeId": "1758100169961010",
+          "createdAt": 1762262421455,
+          "remark": "Biomek i7 Hybrid (Span8+MC96) / Automated Liquid Handling Station-1_96-channel reservoir, single-channel, high-profile skirt, 290 mL (newly added)",
+          "usedByNodeIds": [
+            "1758100169961010"
+          ],
+          "referenceCount": 1
+        },
+        {
+          "consumableInstanceId": "1762262431799776",
+          "consumableId": 10036,
+          "consumableName": "200 μL 96-well PCR plate (new)",
+          "specification": "100 pieces/box (Model: PCR-96BR-HF-W-P)",
+          "unit": "piece",
+          "sourceNodeId": "1758100169961010",
+          "createdAt": 1762262431799,
+          "remark": null,
+          "usedByNodeIds": [
+            "1758100169961010"
+          ],
+          "referenceCount": 1
+        },
+        {
+          "consumableInstanceId": "1762262435345593",
+          "consumableId": 10038,
+          "consumableName": "2.2 mL Square-well U-bottom Deep-well Plate (New)",
+          "specification": "50 plates/case (Model: P-2.2-SQ-96)",
+          "unit": "piece",
+          "sourceNodeId": "1758100169961010",
+          "createdAt": 1762262435345,
+          "remark": null,
+          "usedByNodeIds": [
+            "1758100169961010"
+          ],
+          "referenceCount": 1
+        },
+        {
+          "consumableInstanceId": "1762262435346725",
+          "consumableId": 10038,
+          "consumableName": "2.2 mL Square-well U-bottom Deep-well Plate (New)",
+          "specification": "50 plates/case (Model: P-2.2-SQ-96)",
+          "unit": "piece",
+          "sourceNodeId": "1758100169961010",
+          "createdAt": 1762262435346,
+          "remark": "Biomek i7 Hybrid (Span8+MC96) / Automated Liquid Handling Station-1_2.2 mL square-well U-bottom deep-well plate (newly added)",
+          "usedByNodeIds": [
+            "1758100169961010"
+          ],
+          "referenceCount": 1
+        }
+      ]
+    },
+    "error_type": "PHYSICAL_CONSTRAINT_VIOLATION",
+    "error_description": "xxx"
+  }
+]

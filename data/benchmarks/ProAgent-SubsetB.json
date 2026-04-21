@@ -1,0 +1,588 @@
+[
+  {
+    "id": "subset_b_037",
+    "instruction": "Design an automated workflow for the protein expression analysis step in E. coli experiments. Use LabChip for capillary electrophoresis analysis of the protein expression products.",
+    "setup_state": {
+      "current_state": "GENERATING_CODE",
+      "available_data": {
+        "$draft": "This protocol cannot be generated as the provided JSON list of execution steps is empty. Please provide the JSON execution steps to create the corresponding laboratory protocol.",
+        "$exp_info": {
+          "name": "Fragmentation - Protein Expression and Analysis",
+          "description": null,
+          "constraints": [
+            "Define necessary consumables and equipment in the nodes section."
+          ]
+        }
+      }
+    },
+    "ground_truth": {
+      "source": "Experiment 2: Identification of E. coli Culture and Protein Expression",
+      "templateName": "Fragmentation - Protein Expression and Analysis",
+      "query": "Design an automated workflow for the protein expression analysis step in E. coli experiments. Use LabChip for capillary electrophoresis analysis of protein expression products.",
+      "templateTypeCode": "public",
+      "nodes": [
+        {
+          "templateNodeId": 1756458546161460,
+          "templateId": "1953667588823543809",
+          "resourceId": 60,
+          "nodeName": "LabChip GX Touch HT / Capillary Electrophoresis System",
+          "nodeType": "device",
+          "sequence": null,
+          "positionX": -2900,
+          "positionY": -640,
+          "runningTimes": null,
+          "nodeConfig": {
+            "meta": {
+              "processType": "labchip_gx_touch_ht_editor",
+              "deviceName": "Capillary Electrophoresis Instrument",
+              "description": "Capillary electrophoresis detection system"
+            },
+            "formSchema": {
+              "consumableName": {
+                "type": "consumable_reference",
+                "label": "Detection Consumables",
+                "required": true,
+                "ui": {
+                  "placeholder": "Please select from the chosen consumables",
+                  "tooltip": "Select the consumables to be tested (inherited from the previous node)"
+                }
+              },
+              "sourceWellPosition": {
+                "type": "text_input",
+                "label": "Source Well",
+                "defaultValue": "A1",
+                "required": true,
+                "ui": {
+                  "placeholder": "e.g., A1, B2, H12",
+                  "tooltip": "Specify the source well for the sample, e.g., A1"
+                }
+              },
+              "sampleVolume_uL": {
+                "type": "number_input",
+                "label": "Sample Volume (μL)",
+                "defaultValue": 1,
+                "required": true,
+                "validation": {
+                  "min": 10,
+                  "max": 40,
+                  "step": 0.1
+                },
+                "ui": {
+                  "suffix": "μL",
+                  "tooltip": "Set the sample detection volume, range 0.5–10.0 μL"
+                }
+              },
+              "sampleCount": {
+                "type": "number_input",
+                "label": "Sample Count",
+                "defaultValue": 1,
+                "required": true,
+                "validation": {
+                  "min": 1,
+                  "max": 96
+                },
+                "ui": {
+                  "tooltip": "Set the number of samples to be tested, ranging from 1 to 96."
+                }
+              }
+            },
+            "outputMapping": {
+              "direct": [
+                "consumableName",
+                "sourceWellPosition",
+                "sampleVolume_uL",
+                "sampleCount"
+              ]
+            }
+          },
+          "parameters": {
+            "consumableName": "2.2 Square-well U-bottom plate / 2.2 mL deep-well plate (50 plates/case, Model: P-2.2-SQ-96)",
+            "sourceWellPosition": "A1",
+            "sampleVolume_uL": 1,
+            "sampleCount": 96
+          }
+        }
+      ],
+      "connections": [],
+      "consumables": []
+    }
+  },
+  {
+    "id": "subset_b_039",
+    "instruction": "Design an automated workflow for the enzymatic digestion step in proteomics experiments. Perform addition of trypsin and incubation for digestion, degrading proteins into peptide fragments.",
+    "setup_state": {
+      "current_state": "GENERATING_CODE",
+      "available_data": {
+        "$draft": "1. Transfer 50 µL from the Deep-well Source Plate to the Target PCR Plate.\n2. Prime the pipette by aspirating and dispensing 50 µL of the liquid three times to ensure system readiness.\n3. Transfer 100 µL from the Reagent Trough to the Target PCR Plate.\n4. Seal the Target PCR Plate.\n5. Centrifuge the sealed Target PCR Plate at 1000 rpm for 1 minute to collect the contents at the bottom of the wells.\n6. Place the Target PCR Plate onto the Thermocycler block.\n7. Initiate the Thermocycler program: Heat lid to 105 °C, then run the specified PCR protocol for 5 minutes.\n8. Following the Thermocycler run, centrifuge the Target PCR Plate at 1000 rpm for 1 minute.\n9. Transfer 10 µL from the Target PCR Plate to the final Culture Plate.",
+        "$exp_info": {
+          "name": "Fragmentation - Enzymatic Digestion",
+          "description": null,
+          "constraints": [
+            "Define necessary consumables and equipment in the nodes section."
+          ]
+        }
+      }
+    },
+    "ground_truth": {
+      "source": "Experiment 9: Proteomics Experiment",
+      "templateName": "Fragmentation – Enzymatic Digestion",
+      "query": "Design an automated workflow for the enzymatic digestion step in proteomics experiments. Perform addition of trypsin and incubation for digestion, degrading proteins into peptide fragments.",
+      "templateTypeCode": "public",
+      "nodes": [
+        {
+          "templateNodeId": 1758109854489032,
+          "templateId": "1953687418226176001",
+          "resourceId": 65,
+          "nodeName": "Cytomat 2C450-LiN / Automated Incubator",
+          "nodeType": "device",
+          "sequence": null,
+          "positionX": 220,
+          "positionY": 100,
+          "runningTimes": null,
+          "nodeConfig": {
+            "meta": {
+              "processType": "cytomat_2c450_editor",
+              "deviceName": "Automated Incubator",
+              "description": "Temperature-controlled incubation device"
+            },
+            "formSchema": {
+              "consumableName": {
+                "type": "consumable_reference",
+                "label": "Storage Consumables",
+                "required": true,
+                "ui": {
+                  "placeholder": "Please select from the chosen consumables",
+                  "tooltip": "Select the consumables to be incubated (choose from those already added to the workflow)"
+                }
+              },
+              "temperature_C": {
+                "type": "number_input",
+                "label": "Temperature (℃)",
+                "defaultValue": 37,
+                "required": true,
+                "validation": {
+                  "min": 1,
+                  "max": 120
+                },
+                "ui": {
+                  "suffix": "℃",
+                  "tooltip": "Set incubation temperature"
+                }
+              },
+              "rotationSpeed_rpm": {
+                "type": "number_input",
+                "label": "Rotation speed (rpm)",
+                "defaultValue": 200,
+                "required": true,
+                "validation": {
+                  "min": 0,
+                  "max": 1000
+                },
+                "ui": {
+                  "suffix": "rpm",
+                  "tooltip": "Set rotation speed"
+                }
+              },
+              "incubationTime": {
+                "type": "time_input",
+                "label": "Incubation time",
+                "defaultValue": "00:02:00:00",
+                "required": true,
+                "ui": {
+                  "format": "DD:HH:MM:SS",
+                  "tooltip": "Set incubation duration, format: days:hours:minutes:seconds"
+                }
+              }
+            },
+            "outputMapping": {
+              "direct": [
+                "consumableName",
+                "temperature_C",
+                "rotationSpeed_rpm",
+                "incubationTime"
+              ]
+            }
+          },
+          "parameters": {
+            "consumableName": "new_10038",
+            "temperature_C": 37,
+            "rotationSpeed_rpm": 0,
+            "incubationTime": "00:30:00"
+          }
+        },
+        {
+          "templateNodeId": 1758109931522652,
+          "templateId": "1953687418226176001",
+          "resourceId": 59,
+          "nodeName": "Biomek i7 Hybrid (Span8+MC96) / Automated Liquid Handling Workstation-1",
+          "nodeType": "device",
+          "sequence": null,
+          "positionX": 560,
+          "positionY": 100,
+          "runningTimes": null,
+          "nodeConfig": {
+            "meta": {
+              "processType": "automated_pipetting_station",
+              "deviceName": "Automated pipetting workstation",
+              "version": "1.2"
+            },
+            "formSchema": {
+              "workflowSteps": {
+                "type": "array_group",
+                "label": "Workflow Steps",
+                "minItems": 1,
+                "maxItems": 20,
+                "ui": {
+                  "tooltip": "Define the steps of the pipetting workflow"
+                },
+                "itemSchema": {
+                  "stepName": {
+                    "type": "text_input",
+                    "label": "Step Name",
+                    "required": true,
+                    "defaultValue": "Pipetting steps",
+                    "ui": {
+                      "placeholder": "Please enter the step name"
+                    }
+                  },
+                  "operationType": {
+                    "type": "select_input",
+                    "label": "Operation Type",
+                    "required": true,
+                    "defaultValue": "transfer",
+                    "options": [
+                      {
+                        "value": "transfer",
+                        "label": "Pipetting"
+                      },
+                      {
+                        "value": "shake",
+                        "label": "Vortex"
+                      },
+                      {
+                        "value": "temperature",
+                        "label": "Temperature control"
+                      },
+                      {
+                        "value": "magneticModule",
+                        "label": "Magnetic Module"
+                      }
+                    ]
+                  },
+                  "magneticConsumable": {
+                    "type": "consumable_reference",
+                    "label": "Magnetic consumables",
+                    "required": true,
+                    "ui": {
+                      "placeholder": "Please select from the chosen consumables",
+                      "tooltip": "Select the consumable requiring magnetic force (inherited from the previous node)"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "magneticModule"
+                      ]
+                    }
+                  },
+                  "sourceConsumable": {
+                    "type": "consumable_select",
+                    "label": "Source Plate",
+                    "required": true,
+                    "ui": {
+                      "placeholder": "Please select the source plate",
+                      "tooltip": "Select the source plate for the operation"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "transfer",
+                        "shake",
+                        "temperature"
+                      ]
+                    }
+                  },
+                  "reagentName": {
+                    "type": "text_input",
+                    "label": "Reagent Name",
+                    "ui": {
+                      "placeholder": "Please enter the reagent name",
+                      "tooltip": "Reagents involved in the input"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "transfer"
+                      ]
+                    }
+                  },
+                  "targetConsumable": {
+                    "type": "consumable_select",
+                    "label": "Target Plate",
+                    "ui": {
+                      "placeholder": "Please select the target plate",
+                      "tooltip": "Select the target plate for pipetting"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "transfer"
+                      ]
+                    }
+                  },
+                  "volume": {
+                    "type": "number_input",
+                    "label": "Pipetting volume",
+                    "defaultValue": 100,
+                    "validation": {
+                      "min": 0.5,
+                      "max": 5000,
+                      "step": 0.1,
+                      "precision": 1
+                    },
+                    "ui": {
+                      "tooltip": "Input pipetting volume"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "transfer"
+                      ]
+                    }
+                  },
+                  "unit": {
+                    "type": "select_input",
+                    "label": "Volume unit",
+                    "defaultValue": "µL",
+                    "options": [
+                      {
+                        "value": "µL",
+                        "label": "µL"
+                      },
+                      {
+                        "value": "mL",
+                        "label": "milliliter (mL)"
+                      }
+                    ],
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "transfer"
+                      ]
+                    }
+                  },
+                  "shakingMode": {
+                    "type": "select_input",
+                    "label": "Shaking mode",
+                    "defaultValue": "clockwise",
+                    "options": [
+                      {
+                        "value": "clockwise",
+                        "label": "Clockwise"
+                      },
+                      {
+                        "value": "counterclockwise",
+                        "label": "Counterclockwise"
+                      }
+                    ],
+                    "ui": {
+                      "tooltip": "Select oscillation direction"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "shake"
+                      ]
+                    }
+                  },
+                  "rotationSpeed_rpm": {
+                    "type": "number_input",
+                    "label": "rpm",
+                    "defaultValue": 300,
+                    "validation": {
+                      "min": 50,
+                      "max": 1200,
+                      "step": 10
+                    },
+                    "ui": {
+                      "suffix": "rpm",
+                      "tooltip": "Set the oscillation speed"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "shake"
+                      ]
+                    }
+                  },
+                  "shakingDuration": {
+                    "type": "time_input",
+                    "label": "Shaking time",
+                    "defaultValue": "00:02:30",
+                    "ui": {
+                      "format": "HH:MM:SS",
+                      "tooltip": "Set oscillation duration"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "shake"
+                      ]
+                    }
+                  },
+                  "magneticDuration": {
+                    "type": "time_input",
+                    "label": "Time",
+                    "defaultValue": "00:02:30",
+                    "ui": {
+                      "format": "HH:MM:SS",
+                      "tooltip": "Set Duration"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "magneticModule"
+                      ]
+                    }
+                  },
+                  "temperature_C": {
+                    "type": "number_input",
+                    "label": "Temperature",
+                    "defaultValue": 25,
+                    "validation": {
+                      "min": 4,
+                      "max": 100,
+                      "step": 0.1,
+                      "precision": 1
+                    },
+                    "ui": {
+                      "suffix": "℃",
+                      "tooltip": "Set temperature"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "temperature"
+                      ]
+                    }
+                  },
+                  "temperatureDuration": {
+                    "type": "time_input",
+                    "label": "Temperature control time",
+                    "defaultValue": "00:10:00",
+                    "ui": {
+                      "format": "HH:MM:SS",
+                      "tooltip": "Set temperature-controlled duration"
+                    },
+                    "visibility": {
+                      "dependsOn": "operationType",
+                      "showWhen": [
+                        "temperature"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "outputMapping": {
+              "arrays": {
+                "workflowSteps": {
+                  "sourceField": "workflowSteps",
+                  "itemMapping": {
+                    "stepName": "stepName",
+                    "operationType": "operationType",
+                    "reagentName": "reagentName",
+                    "sourceConsumable": "sourceConsumable",
+                    "targetConsumable": "targetConsumable",
+                    "volume": "volume",
+                    "unit": "unit",
+                    "shakingMode": "shakingMode",
+                    "rotationSpeed_rpm": "rotationSpeed_rpm",
+                    "shakingDuration": "shakingDuration",
+                    "temperature_C": "temperature_C",
+                    "temperatureDuration": "temperatureDuration",
+                    "magneticConsumable": "magneticConsumable",
+                    "magneticDuration": "magneticDuration"
+                  }
+                }
+              }
+            }
+          },
+          "parameters": {
+            "workflowSteps": [
+              {
+                "stepName": "Pipetting Steps",
+                "operationType": "transfer",
+                "reagentName": "300 mM iodoacetamide (IAM)",
+                "sourceConsumable": "new_10038",
+                "targetConsumable": "new_10038",
+                "volume": 24,
+                "unit": "µL",
+                "shakingMode": "clockwise",
+                "rotationSpeed_rpm": 300,
+                "shakingDuration": "00:02:30",
+                "temperature_C": 25,
+                "temperatureDuration": "00:10:00",
+                "magneticConsumable": "",
+                "magneticDuration": "00:02:30"
+              }
+            ]
+          }
+        }
+      ],
+      "connections": [
+        {
+          "connectionId": "1985948582486351873",
+          "templateId": "1953687418226176001",
+          "sourceNodeId": 1758109854489032,
+          "targetNodeId": 1758109931522652,
+          "sourceHandle": "right",
+          "targetHandle": "left"
+        }
+      ],
+      "consumables": [
+        {
+          "consumableInstanceId": "1762321830901939",
+          "consumableId": 10038,
+          "consumableName": "2.2 mL Square Well U-Bottom Deep Well Plate (New)",
+          "specification": "50 plates/case (Model: P-2.2-SQ-96)",
+          "unit": "piece",
+          "sourceNodeId": "1758109854489032",
+          "createdAt": 1762321830901,
+          "remark": "Cytomat 2C450-LiN / Automated Incubator_2.2 mL square-well U-bottom deep-well plate (newly added)",
+          "usedByNodeIds": [
+            "1758109854489032"
+          ],
+          "referenceCount": 1
+        },
+        {
+          "consumableInstanceId": "1762321839035239",
+          "consumableId": 10038,
+          "consumableName": "2.2 mL Square-well U-bottom Deep-well Plate (New)",
+          "specification": "50 plates/case (Model: P-2.2-SQ-96)",
+          "unit": "piece",
+          "sourceNodeId": "1758109931522652",
+          "createdAt": 1762321839035,
+          "remark": "Biomek i7 Hybrid (Span8+MC96) / Automated Liquid Handling Station-1_2.2 mL square-well U-bottom deep-well plate (newly added)",
+          "usedByNodeIds": [
+            "1758109931522652"
+          ],
+          "referenceCount": 1
+        },
+        {
+          "consumableInstanceId": "1762321849268047",
+          "consumableId": 10038,
+          "consumableName": "2.2 mL square-well U-bottom deep-well plate (newly added)",
+          "specification": "50 plates/case (Model: P-2.2-SQ-96)",
+          "unit": "piece",
+          "sourceNodeId": "1758109931522652",
+          "createdAt": 1762321849268,
+          "remark": "Biomek i7 Hybrid (Span8+MC96) / Automated Liquid Handling Station-1_2.2 mL square-well U-bottom deep-well plate (newly added)",
+          "usedByNodeIds": [
+            "1758109931522652"
+          ],
+          "referenceCount": 1
+        }
+      ]
+    }
+  }
+]

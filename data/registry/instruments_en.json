@@ -1,0 +1,28 @@
+[
+  {
+    "resourceId": 48,
+    "deviceName": "Automated Liquid Handling Station-2",
+    "labId": 1,
+    "model": "Biomek i5",
+    "supplier": "Beckman Coulter",
+    "statusCode": "available",
+    "description": "Automated Liquid Handling Station , , . 、 : 10027~10044、10051~10053; : 10029~10031、10036~10044、10051~10053; : 10053.",
+    "specifications": "workflowSteps: Automated Liquid Handling Workstation , : \"transfer\" , \"shake\" , \"temperature\" , \"positivePressureModule\" , \"magneticModule\" , \"cleanStationModule\" . . * : - stepName: , . - operationType: , \"transfer\". - reagentName: , null. - sourceConsumable: , , (consumableName). - targetConsumable: , , (consumableName). - consumableName: 、 , . - volume: . - unit: , \"µL\" \"mL\". * : - stepName: , . - operationType: , \"shake\". - sourceConsumable: , , (consumableName). - consumableName: 、 , . - shakingMode: , \"clockwise\" , \"counterclockwise\" . - rotationSpeed_rpm: , rpm, 0~1000. - shakingDration: , \"HH:MM:SS\". * : - stepName: , . - operationType: , \"temperature\". - sourceConsumable: , , (consumableName). - consumableName: 、 , . - temperature_C: , (℃), 0~100. - temperatureDuration: , \"HH:MM:SS\". * : - stepName: , . - operationType: , \"positivePressureModule\". - positivePressure_consumebleSelect: . - filterPressure_MPa: , MPa, 0.4~0.7 MPa. - defaultDuration: , \"HH:MM:SS\". * : - stepName: , . - operationType: , \"magneticModule\". - consumableName_reference: . - defaultDuration: , \"HH:MM:SS\". * : - stepName: , . - operationType: , \"cleanStationModule\". - consumableName_reference: . - defaultDuration: , \"HH:MM:SS\".",
+    "parameters": "{ \"workflowSteps\": [ { \"stepName\": \"placeholder_str\", \"operationType\": \"transfer\", \"reagentName\": null | \"placeholder_str\", \"sourceConsumable\": \"placeholder_str\", \"targetConsumable\": \"placeholder_str\", \"consumableName\": \"placeholder_str\", \"volume\": <float>, \"unit\": \"µL\" | \"mL\" }, ... { \"stepName\": \"placeholder_str\", \"operationType\": \"shake\", \"sourceConsumable\": \"placeholder_str\", \"consumableName\": \"placeholder_str\", \"shakingMode\": \"clockwise\" | \"counterclockwise\", \"rotationSpeed_rpm\": 0, \"shakingDration\": <HH:MM:SS> }, ... { \"stepName\": \"placeholder_str\", \"operationType\": \"temperature\", \"sourceConsumable\": \"placeholder_str\", \"consumableName\": \"placeholder_str\", \"temperature_C\": 0, \"temperatureDuration\": <HH:MM:SS> }, ... { \"stepName\": \"placeholder_str\", \"operationType\": \"positivePressureModule\", \"positivePressure_consumebleSelect\": \"placeholder_str\", \"filterPressure_MPa\": <float>, \"defaultDration\": <HH:MM:SS> }, ... { \"stepName\": \"placeholder_str\", \"operationType\": \"magneticModule\", \"consumableName_reference\": \"placeholder_str\", \"defaultDration\": <HH:MM:SS> }, ... { \"stepName\": \"placeholder_str\", \"operationType\": \"cleanStationModule\", \"consumableName_reference\": \"placeholder_str\", \"defaultDration\": <HH:MM:SS> }, ... ] }",
+    "template": "{'processType': 'biomek_pipetting_editor', 'parameters': {'workflowSteps': {'label': ' ', 'type': 'group'}}}",
+    "script": ""
+  },
+  {
+    "resourceId": 49,
+    "deviceName": "Consumables Supply Station-1",
+    "labId": 1,
+    "model": "Cytomat 24 Hotel",
+    "supplier": "Thermo Fisher Scientific",
+    "statusCode": "invalid",
+    "description": "Resource 49 (Consumables Supply Station-1) in automation inventory.",
+    "specifications": "",
+    "parameters": "{}",
+    "template": "",
+    "script": ""
+  }
+]

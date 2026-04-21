@@ -1,0 +1,22 @@
+[
+  {
+    "resourceId": 10023,
+    "materialName": "Cs,Tips,1070 μL,non-sterile,480tips",
+    "name": "96 Tips/1070 μL/Non-Sterile",
+    "supplier": "Beckman Coulter",
+    "type": "Pipette Tips",
+    "statusCode": "available",
+    "description": "* ( 、 ), . * 500 μL .",
+    "pairedDevices": "48: Biomek i5 Automated Liquid Handling Workstation"
+  },
+  {
+    "resourceId": 10024,
+    "materialName": "Cs, Tips, 230 μL, Non-Sterile, 960 tips",
+    "name": "96 Tips/230 μL/Non-Sterile",
+    "supplier": "Beckman Coulter",
+    "type": "Pipette Tips",
+    "statusCode": "available",
+    "description": "* ( 、 ), . * 90~920 μL, .",
+    "pairedDevices": "48: Biomek i5 Automated Liquid Handling Workstation 59: Biomek i7 Automated Liquid Handling Workstation"
+  }
+]
