@@ -1,4 +1,4 @@
-﻿# main_evaluation.py
+# main_evaluation.py
 
 """
 ProAgent - State Machine-Based Adaptive Biological Experiment Planning Agent
@@ -91,18 +91,18 @@ class ProAgent:
         
         # --- [Ablation Logic] Dynamically Remove Tools ---
         if self.ablation_config.get("no_rag"):
-            print("馃毇 [Ablation] Disable RAG (Retrieve Knowledge)")
+            print("[Ablation] Disable RAG (Retrieve Knowledge)")
             if "retrieve_knowledge" in self.available_tools:
                 del self.available_tools["retrieve_knowledge"]
                 
         if self.ablation_config.get("no_reflect"):
-            print("馃毇 [Ablation] Disable Reflection/Validation")
+            print("[Ablation] Disable Reflection/Validation")
             for t in ["reflect_on_protocol", "modify_protocol", "validate_machine_code", "fix_machine_code"]:
                 if t in self.available_tools:
                     del self.available_tools[t]
                     
         if self.ablation_config.get("no_clarify"):
-            print("馃毇 [Ablation] Disable Clarification")
+            print("[Ablation] Disable Clarification")
             if "clarify_experiment_scope" in self.available_tools:
                 del self.available_tools["clarify_experiment_scope"]
         
@@ -145,7 +145,7 @@ class ProAgent:
         os.makedirs(self.log_dir, exist_ok=True)
         os.makedirs(self.result_dir, exist_ok=True)
         
-        print("鉁?ProAgent initialization completed")
+        print("✅ ProAgent initialization completed")
 
     def set_confirmation_gate_mode(self, enabled: bool):
         """Enable or disable draft->code confirmation gate (used by evaluation profiles)."""
@@ -156,8 +156,50 @@ class ProAgent:
     def _create_session(self) -> SessionState:
         """Create a new conversation session"""
         session_id = f"session_{uuid.uuid4().hex[:8]}"
-        print(f"馃摑 New session: {session_id}")
+        print(f"📝 New session: {session_id}")
         return SessionState(session_id=session_id)
+    
+    def _update_session_for_evaluate(self, subset: str, session_state: SessionState, initial_data: Dict[str, Any]) -> None:
+        """Initialize SessionState fields from external initial_data."""
+        
+        setup_state = initial_data.get("setup_state", {})
+        available_data = setup_state.get("available_data", {})
+
+        code = initial_data.get("injected_error_code",{})
+
+        # 1. update current_state
+        if subset == "B":
+            session_state.current_state = AgentState.DESIGN_CODE
+
+        elif subset == "D":
+            session_state.current_state = AgentState.RECTIFY_CODE
+
+        # 2. update available_data from subset B
+        if available_data:
+
+            # $draft 
+            if "$draft" in available_data:
+                draft = available_data["$draft"]
+                session_state.current_draft = draft
+                session_state.mem_work["draft"] = draft
+                session_state.mem_work["current_draft"] = draft
+
+            # $exp_info 
+            exp_info = available_data.get("$exp_info", {})
+            if exp_info and isinstance(exp_info, dict):
+                name = exp_info.get("name", "")
+                desc = exp_info.get("description", "")
+                constraints = exp_info.get("constraints", [])
+                context_parts = [name, desc] + constraints
+                session_state.global_exp_context = "\n".join(part for part in context_parts if part)
+                session_state.mem_work["exp_info"] = "\n".join(part for part in context_parts if part)
+        
+        # 3. update available_data from subset D
+        if code:
+            session_state.mem_work["machine_code"] = code
+            session_state.mem_work["exp_info"] = initial_data.get("query") or ""
+
+        return session_state
     
     # ==================== Memory Management ====================
     
@@ -170,7 +212,7 @@ class ProAgent:
             try:
                 self.mem.add(messages, user_id=session_id)
             except Exception as e:
-                print(f"鈿狅笍 [Memory] Write failed: {e}")
+                print(f"❌ [Memory] Write failed: {e}")
 
         threading.Thread(target=_task, daemon=True).start()
     
@@ -197,7 +239,7 @@ class ProAgent:
             return "\n".join(memory_texts) if memory_texts else "No relevant historical memory."
 
         except Exception as e:
-            print(f"鈿狅笍 [Memory] Retrieval failed: {e}")
+            print(f"❌ [Memory] Retrieval failed: {e}")
             return "The memory system is temporarily unavailable."
 
     
@@ -336,20 +378,20 @@ class ProAgent:
                         coerced[param_name] = json.dumps(value, ensure_ascii=False, indent=2)
                     else:
                         coerced[param_name] = str(value)
-                    print(f"鈿狅笍 Type conversion: {param_name} ({type(value).__name__} 鈫?str)")
+                    print(f"⚠️ Type conversion: {param_name} ({type(value).__name__} → str)")
 
             elif expected_type == "dict":
                 if not isinstance(value, dict):
                     if isinstance(value, str):
                         try:
                             coerced[param_name] = json.loads(value)
-                            print(f"鈿狅笍 Type conversion: {param_name} (str 鈫?dict)")
+                            print(f"⚠️ Type conversion: {param_name} (str → dict)")
                         except json.JSONDecodeError:
                             coerced[param_name] = {"message": value}
-                            print(f"鈿狅笍 Type conversion: {param_name} (str 鈫?dict wrapper)")
+                            print(f"⚠️ Type conversion: {param_name} (str → dict wrapper)")
                     else:
                         coerced[param_name] = {"value": str(value)}
-                        print(f"鈿狅笍 Type conversion: {param_name} ({type(value).__name__} 鈫?dict)")
+                        print(f"⚠️ Type conversion: {param_name} ({type(value).__name__} → dict)")
 
         return coerced
 
@@ -369,7 +411,7 @@ class ProAgent:
         print(f"\n>> Step {step_idx}: {tool_name}")
         
         if tool_name not in self.available_tools:
-            print(f"鉂?Tool does not exist: {tool_name}")
+            print(f"⚠️ Tool does not exist: {tool_name}")
             return ExecutionRecord(
                 tool=tool_name,
                 status="failed",
@@ -404,7 +446,7 @@ class ProAgent:
                             break
                 
                 if critical_missing:
-                    print(f"鈿狅笍 Missing critical data: {critical_missing}")
+                    print(f"❌ Missing critical data: {critical_missing}")
                     return ExecutionRecord(
                         tool=tool_name,
                         status="blocked",
@@ -412,7 +454,7 @@ class ProAgent:
                         output={"error": "missing_dependency", "refs": critical_missing}
                     )
                 else:
-                    print(f"鈿狅笍 Non-critical data missing: {missing_refs}, continuing execution")
+                    print(f"❌ Non-critical data missing: {missing_refs}, continuing execution")
             
             # 3. Type validation and correction
             args = self._validate_and_coerce_args(tool_name, args)
@@ -441,7 +483,7 @@ class ProAgent:
 
             # 9. Generate summary
             summary = self._generate_output_summary(output)
-            print(f"鉁?Result: {summary}")
+            print(f"📝 Result: {summary}")
 
 
             # 10. Check tool return status
@@ -519,7 +561,7 @@ class ProAgent:
 
         # Print storage confirmation
         output_preview = str(output)[:100] + "..." if len(str(output)) > 100 else str(output)
-        print(f"馃捑 Stored: {key} = {output_preview}")
+        print(f"📝 Stored: {key} = {output_preview}")
 
 
         # Special handling
@@ -538,7 +580,7 @@ class ProAgent:
 
             state.global_exp_context = exp_info[:500]
             state.mem_work["exp_info"] = exp_info  # Ensure storage
-            print("馃挕 Experiment background updated")
+            print("📝 Experiment background updated")
 
 
         elif tool_name in ["generate_scientific_draft", "modify_protocol"]:
@@ -559,12 +601,12 @@ class ProAgent:
             state.current_draft = draft_content[:5000]
             state.mem_work["draft"] = draft_content
             state.mem_work["current_draft"] = draft_content
-            print(f"馃摑 Draft updated (version {len(state.draft_history) + 1})")
+            print(f"📝 Draft updated (version {len(state.draft_history) + 1})")
         
         elif tool_name == "retrieve_knowledge":
             # Ensure knowledge is stored correctly
             state.mem_work["knowledge"] = output
-            print("馃摎 Knowledge stored")
+            print("📝 Knowledge stored")
 
 
         elif tool_name == "reflect_on_protocol":
@@ -576,7 +618,7 @@ class ProAgent:
             else:
                 out_str = str(output).lower()
                 state.mem_work["sigma_sci"] = 1 if "pass" in out_str or "done" in out_str or "yes" in out_str else -1
-            print("馃攳 K_s verification stored")
+            print("📝 K_s verification stored")
 
 
         elif tool_name == "validate_machine_code":
@@ -623,7 +665,7 @@ class ProAgent:
             # Detect A-B-A-B pattern
             unique_states = set(recent)
             if len(unique_states) <= 2:
-                print(f"鈿狅笍 State oscillation detected: {recent}")
+                print(f"❌ State oscillation detected: {recent}")
                 return True
 
         return False
@@ -633,7 +675,7 @@ class ProAgent:
         """Check tool retry count limit"""
         count = state.tool_attempt_counts.get(tool_name, 0)
         if count >= self.max_tool_retries:
-            print(f"鈿狅笍 Tool {tool_name} has retried {count} times, skipping")
+            print(f"❌ Tool {tool_name} has retried {count} times, skipping")
             return True
         return False
     
@@ -692,8 +734,8 @@ class ProAgent:
         """Build final response"""
         if reason == "task_completed":
             if state.current_draft:
-                return f"鉁?Task completed! \n\n**Experiment Plan:**\n{state.current_draft[:3000]}"
-            return "鉁?Task completed!"
+                return f"✅Task completed! \n\n**Experiment Plan:**\n{state.current_draft[:3000]}"
+            return "✅Task completed!"
 
         elif reason == "chat_response":
             return state.mem_work.get("chat_response", "Hello! How can I assist you?")
@@ -705,16 +747,16 @@ class ProAgent:
         elif reason == "code_validated":
             machine_code = state.mem_work.get("machine_code", "")
             if machine_code:
-                return f"鉁?Machine code generated and validated successfully! \n\n```json\n{str(machine_code)[:2000]}\n```"
-            return "鉁?Machine code validated successfully!"
+                return f"✅Machine code generated and validated successfully! \n\n```json\n{str(machine_code)[:2000]}\n```"
+            return "✅Machine code validated successfully!"
 
         elif reason == "user_declined":
             if state.current_draft:
-                return f"Okay, paused. Here's the current plan鈥攍et me know if you want to continue: \n\n{state.current_draft[:2000]}"
+                return f"Okay, paused. Here's the current plan, let me know if you want to continue: \n\n{state.current_draft[:2000]}"
             return "Okay, paused. Let me know if you want to continue."
 
         elif reason == "validation_passed":
-            return f"鉁?Plan validated successfully! \n\n{state.current_draft[:2000]}" if state.current_draft else "Plan completed."
+            return f"✅Plan validated successfully! \n\n{state.current_draft[:2000]}" if state.current_draft else "Plan completed."
 
         elif reason == "state_completed":
             return self._build_final_response(state, "task_completed")
@@ -723,7 +765,7 @@ class ProAgent:
             # Default: return current progress
             if state.current_draft:
                 return f"Current progress: \n\n{state.current_draft[:2000]}"
-            return "Task in progress鈥攑lease continue describing your request."
+            return "Task in progress, please continue describing your request."
     
     # ==================== Main Loop ====================
     
@@ -755,7 +797,7 @@ class ProAgent:
         chat_history_str = self._format_chat_history(state.chat_history[-6:])
         intent_type, chat_response = self.planner.classify_intent(user_query, chat_history_str)
         
-        print(f"馃幆 Intent recognized: {intent_type}")
+        print(f"🎯 Intent recognized: {intent_type}")
         
         if intent_type == "chat":
             state.chat_history.append(HumanMessage(content=user_query))
@@ -775,13 +817,13 @@ class ProAgent:
         consecutive_failures = 0
         final_answer = None
 
-        print(f"\n馃搳 Available data: {list(state.mem_work.keys())}")
+        print(f"\n📊 Available data: {list(state.mem_work.keys())}")
 
 
         # === Plan-Execute Loop ===
         for loop_i in range(self.max_loops):
             print(f"\n{'-'*50}")
-            print(f"馃攧 [Loop {loop_i + 1}/{self.max_loops}]")
+            print(f"🟢 [Loop {loop_i + 1}/{self.max_loops}]")
             print(f"{'-'*50}")
 
 
@@ -801,10 +843,10 @@ class ProAgent:
             plan, current_state, step_tokens = self.planner.generate_plan(ctx)
             state.current_state = current_state
             state.total_tokens += step_tokens
-            print(f"馃搳 Current accumulated tokens: {state.total_tokens}")
+            print(f"📊 Current accumulated tokens: {state.total_tokens}")
 
 
-            # 3. 馃攳 Oscillation detection
+            # 3. Oscillation detection
             if self._detect_oscillation(state, current_state):
                 final_answer = self._build_recovery_response(state, "oscillation_detected")
                 break
@@ -817,7 +859,7 @@ class ProAgent:
                     break
                 
                 consecutive_failures += 1
-                print(f"鈿狅笍 Empty plan (consecutive failures: {consecutive_failures})")
+                print(f"❌ Empty plan (consecutive failures: {consecutive_failures})")
                 
                 if consecutive_failures >= self.max_consecutive_failures:
                     final_answer = self._build_recovery_response(state, "max_retries_exceeded")
@@ -828,7 +870,7 @@ class ProAgent:
             
             # 5. Print plan
             plan_tools = [s.get("tool_name", "?") for s in plan]
-            print(f"馃搵 Plan ({len(plan)} steps): {plan_tools}")
+            print(f"📝 Plan ({len(plan)} steps): {plan_tools}")
 
 
             # 6. Execute plan
@@ -839,9 +881,9 @@ class ProAgent:
                 tool_name = step.get("tool_name", "unknown")
 
 
-                # 馃攳 Check tool retry limit
+                #  Check tool retry limit
                 if self._check_tool_retry_limit(state, tool_name):
-                    print(f"鈴笍 Skip {tool_name} (retry limit exceeded)")
+                    print(f"⚠️ Skip {tool_name} (retry limit exceeded)")
                     continue
 
 
@@ -854,13 +896,13 @@ class ProAgent:
 
                 # Handle execution result
                 if result.status == "failed":
-                    print(f"鉂?Step {step_idx} failed: {result.summary}")
+                    print(f"❌ Step {step_idx} failed: {result.summary}")
                     # self._increment_tool_attempt(state, tool_name)
 
 
-                    # 馃攳 Special handling: If validation fails, try rolling back
+                    # Special handling: If validation fails, try rolling back
                     if tool_name == "modify_protocol" and state.draft_history:
-                        print("馃攧 Modification failed, considering rollback...")
+                        print("❌ Modification failed, considering rollback...")
 
 
                     loop_should_break = True
@@ -868,7 +910,7 @@ class ProAgent:
 
 
                 elif result.status == "blocked":
-                    print(f"馃毇 Step {step_idx} blocked: {result.summary}")
+                    print(f"Step {step_idx} blocked: {result.summary}")
                     loop_should_break = True
                     break
 
@@ -882,7 +924,7 @@ class ProAgent:
                 )
                 
                 if should_stop:
-                    print(f"馃弫 Terminate: {reason}")
+                    print(f"🛑 Terminate: {reason}")
                     final_answer = self._build_final_response(state, reason)
                     loop_should_break = True
                     break
@@ -904,7 +946,7 @@ class ProAgent:
         if not final_answer:
             if state.mem_work.get("machine_code"):
                 code = state.mem_work["machine_code"]
-                final_answer = f"鉁?Processing complete! \n\n```json\n{str(code)[:2000]}\n```"
+                final_answer = f"✅ Processing complete! \n\n```json\n{str(code)[:2000]}\n```"
             elif state.current_draft:
                 final_answer = f"Reached max loop count. Current draft: \n\n{state.current_draft[:2000]}"
             else:
@@ -941,13 +983,13 @@ class ProAgent:
         if reason == "oscillation_detected":
             # Return the best current result
             if state.mem_work.get("machine_code"):
-                return "鈿狅笍 Code validation failed multiple times. Below is the latest version (may require manual inspection):\n\n" + \
+                return "❌ Code validation failed multiple times. Below is the latest version (may require manual inspection):\n\n" + \
                     str(state.mem_work["machine_code"])[:2000]
             elif state.current_draft:
-                return "鈿狅笍 Failed to complete automated code generation. Below is the validated experiment plan:\n\n" + \
+                return "❌ Failed to complete automated code generation. Below is the validated experiment plan:\n\n" + \
                     state.current_draft[:2000]
             else:
-                return "鈿狅笍 Encountered difficulties with the task. Please try simplifying the request or describing it step-by-step."
+                return "❌ Encountered difficulties with the task. Please try simplifying the request or describing it step-by-step."
 
         return "Task terminated abnormally."
     
@@ -1016,7 +1058,7 @@ class ProAgent:
 
         with open(log_file, "w", encoding="utf-8") as f:
             json.dump(log_data, f, ensure_ascii=False, indent=2)
-        print(f"馃摑 Log saved to: {log_file}")
+        print(f"📝 Log saved to: {log_file}")
     
     def _save_result(self, state: SessionState, result_type: str, content: Any):
         """Save experiment results"""
@@ -1029,13 +1071,13 @@ class ProAgent:
             else:
                 f.write(str(content))
 
-        print(f"馃捑 Result saved: {result_file}")
+        print(f"📝 Result saved: {result_file}")
 
 
     def _print_state(self, state: SessionState):
         """Print current state (for debugging)"""
         print("\n" + "="*40)
-        print("馃搳 Current Session State")
+        print("📊 Current Session State")
         print("="*40)
         print(f"Session ID: {state.session_id}")
         print(f"Experiment Background: {state.global_exp_context[:100]}...")
