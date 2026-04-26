@@ -143,6 +143,7 @@ results = []
 for item in data:
     query = item.get("query") or item.get("instruction") or item.get("problem") or ""
     state = agent._create_session()
+    state = agent._update_session_for_evaluate(subset, state, item)
     output = agent.process_query(query, state)
     results.append({"id": item.get("id", "na"), "query": query, "output": output})
 
