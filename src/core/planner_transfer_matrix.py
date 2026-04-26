@@ -79,7 +79,7 @@ class ContextSignals:
     sigma_sci_neg: bool = False
     sigma_code: bool = False
     sigma_phys_pos: bool = False
-    sigma_phys_neg: bool = False
+    sigma_phys_neg: bool = True
 
     # User Intent Signals
     user_confirmed_yes: bool = False
@@ -277,7 +277,7 @@ if it is task, only output: [TASK]
             # Priority 2: σ_sci- ∧ σ_draft -> RECTIFY_DRAFT
             (lambda s: s.sigma_sci_neg and s.sigma_draft, AgentState.RECTIFY_DRAFT),
             # Priority 3: ¬σ_draft ∧ σ_know -> DESIGN_DRAFT
-            (lambda s: (not s.sigma_draft) and s.sigma_know, AgentState.DESIGN_DRAFT),
+            (lambda s: (not s.sigma_draft) and (not s.sigma_ambiguous), AgentState.DESIGN_DRAFT),
             # Optional confirmation gate for Subset A style draft-only cutoff.
             (
                 lambda s: self.require_confirmation_before_code and s.user_confirmed_no and s.sigma_draft and s.sigma_sci_pos,
