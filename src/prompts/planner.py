@@ -90,7 +90,7 @@ Output must be a JSON array, each element must contain:
 OutputExample:
 ```json
 [
-  {{"tool_name": "clarify_experiment_scope", "args": {{"query": "User question", "session_id": "{session_id}"}}}},
+  {{"tool_name": "clarify_experiment_scope", "args": {{"query": "User query", "session_id": "{session_id}"}}}},
   {{"tool_name": "retrieve_knowledge", "args": {{"query": "Retrieval content", "session_id": "{session_id}"}}}}
 ]
 
