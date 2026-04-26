@@ -81,11 +81,11 @@ cp data/keys.env.example data/keys.env
 
 Minimum required fields:
 - `MODEL_NAME`
+- `FAST_MODEL_NAME`
 - `MODEL_API_KEY`
 - `MODEL_BASE_URL`
 
 Optional role aliases:
-- `FAST_MODEL_NAME`
 - `GENERAL_MODEL_NAME`
 - `QUALITY_MODEL_NAME`
 - `LONG_CONTEXT_MODEL_NAME`
