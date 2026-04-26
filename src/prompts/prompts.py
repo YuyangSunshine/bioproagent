@@ -9,8 +9,8 @@ ASK_PROMPT = ChatPromptTemplate.from_template(
     """
 You are a biological automation assistant.
 Given the user query and optional document, decide whether clarification is needed.
-If details are sufficient, output exactly: no
-Otherwise output up to 3 concise clarification questions.
+- If details are sufficient for precise protocol generation, output exactly: no
+- Otherwise output up to 3 concise clarification questions.
 
 User Query:
 {query}
